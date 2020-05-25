@@ -51,7 +51,18 @@ PowerShellVersion = '6.1'
 # ProcessorArchitecture = ''
 
 # Modules that must be imported into the global environment prior to importing this module
-# RequiredModules = @()
+RequiredModules = @(
+    @{
+        ModuleName="PowerConfluence"
+        ModuleVersion="0.1.0"
+        Guid="6e741953-480d-44fb-9e1c-117f0747cca1"
+    },
+    @{
+        ModuleName="SqlServer"
+        ModuleVersion="21.1.18179"
+        Guid="97C3B589-6545-4107-A061-3FE23A4E9195"
+    }
+)
 
 # Assemblies that must be loaded prior to importing this module
 # RequiredAssemblies = @()
