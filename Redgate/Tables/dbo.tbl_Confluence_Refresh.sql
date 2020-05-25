@@ -5,7 +5,6 @@ CREATE TABLE [dbo].[tbl_Confluence_Refresh]
 [Refresh_Start_Unix] [int] NOT NULL,
 [Refresh_End] [datetime] NULL,
 [Refresh_End_Unix] [int] NULL,
-[Type] [char] (1) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL CONSTRAINT [DF_tbl_Confluence_Refresh_Type] DEFAULT (' '),
 [Status] [char] (1) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL CONSTRAINT [DF_tbl_Confluence_Refresh_Status] DEFAULT (' '),
 [Deleted] [bit] NOT NULL CONSTRAINT [DF_tbl_Confluence_Refresh_Deleted] DEFAULT ((0))
 ) ON [PRIMARY]

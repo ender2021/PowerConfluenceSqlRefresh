@@ -31,7 +31,7 @@
     Open-ConfluenceSession @ConfluenceConnectionDetails
     $Params = @{
         RefreshType = (Get-ConfluenceRefreshTypes).Differential
-        ProjectKeys = @("PROJKEY","MJPK","KEY3")
+        SpaceKeys = @("PROJKEY","MJPK","KEY3")
         SqlInstance = "my.remote.sql.server,1234"
         SqlDatabase = "Confluence"
     }
@@ -86,25 +86,17 @@ function Update-ConfluenceSql {
         ####################################################
         #  GET PREVIOUS BATCH INFO / CLEAR PREVIOUS BATCH  #
         ####################################################
-
-        $RefreshTypes = Get-ConfluenceRefreshTypes
-
-        if ($RefreshType -eq $RefreshTypes.Full) {
-            Clear-ConfluenceRefresh @sqlSplat
-            $lastRefreshStamp = 0
-            $lastRefreshDate = (Get-Date '1970-01-01')
-        } else {
-            $lastRefresh = Get-LastConfluenceRefresh @sqlSplat
-            $lastRefreshStamp = $lastRefresh.Refresh_Start_Unix
-            $lastRefreshDate = $lastRefresh.Refresh_Start
-        }
+        
+        $lastRefresh = Get-LastConfluenceRefresh @sqlSplat
+        $lastRefreshStamp = $lastRefresh.Refresh_Start_Unix
+        $lastRefreshDate = $lastRefresh.Refresh_Start
 
         ####################################################
         #  BEGIN THE REFRESH BATCH                         #
         ####################################################
 
         Clear-ConfluenceStaging @sqlSplat
-        $refreshId = Start-ConfluenceRefresh -RefreshType $RefreshType @sqlSplat
+        $refreshId = Start-ConfluenceRefresh -RefreshType @sqlSplat
     }
     
     process {
@@ -136,9 +128,6 @@ function Update-ConfluenceSql {
         ####################################################
         #  REFRESH STEP X - SYNC STAGING TO LIVE TABLES    #
         ####################################################
-
-        #determine if deletes should be synced
-        $syncDelete = $deleteRetrieveSuccess -and ($RefreshType -eq $RefreshTypes.Differential)
 
         #perform the sync
         Sync-ConfluenceStaging -SyncDeleted $syncDelete @sqlSplat

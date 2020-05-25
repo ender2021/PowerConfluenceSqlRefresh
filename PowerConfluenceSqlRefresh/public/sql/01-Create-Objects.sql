@@ -46,7 +46,6 @@ CREATE TABLE [dbo].[tbl_Confluence_Refresh]
 [Refresh_Start_Unix] [int] NOT NULL,
 [Refresh_End] [datetime] NULL,
 [Refresh_End_Unix] [int] NULL,
-[Type] [char] (1) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL CONSTRAINT [DF_tbl_Confluence_Refresh_Type] DEFAULT (' '),
 [Status] [char] (1) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL CONSTRAINT [DF_tbl_Confluence_Refresh_Status] DEFAULT (' '),
 [Deleted] [bit] NOT NULL CONSTRAINT [DF_tbl_Confluence_Refresh_Deleted] DEFAULT ((0))
 )
@@ -125,8 +124,13 @@ GO
 -- Create date: 2019-09-28
 -- Description:	Creates a new refresh record
 -- =============================================
+
+-- =============================================
+-- Update Author:	Justin Mead
+-- Update date:		2020-05-25
+-- Description:		Remove un-needed type field
+-- =============================================
 CREATE PROCEDURE [dbo].[usp_Confluence_Refresh_Start]
-	@Type AS CHAR(1)
 AS
 BEGIN
 	SET NOCOUNT ON;
@@ -137,13 +141,11 @@ BEGIN
 	(
 	    [Refresh_Start],
 	    [Refresh_Start_Unix],
-		[Type],
 		[Status]
 	)
 	VALUES
 	(   @currDate,
 	    DATEDIFF(s, '1970-01-01', @currDate),
-		@Type,
 		'S'
 	    )
 

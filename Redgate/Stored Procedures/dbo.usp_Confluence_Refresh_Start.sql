@@ -8,8 +8,13 @@ GO
 -- Create date: 2019-09-28
 -- Description:	Creates a new refresh record
 -- =============================================
+
+-- =============================================
+-- Update Author:	Justin Mead
+-- Update date:		2020-05-25
+-- Description:		Remove un-needed type field
+-- =============================================
 CREATE PROCEDURE [dbo].[usp_Confluence_Refresh_Start]
-	@Type AS CHAR(1)
 AS
 BEGIN
 	SET NOCOUNT ON;
@@ -20,13 +25,11 @@ BEGIN
 	(
 	    [Refresh_Start],
 	    [Refresh_Start_Unix],
-		[Type],
 		[Status]
 	)
 	VALUES
 	(   @currDate,
 	    DATEDIFF(s, '1970-01-01', @currDate),
-		@Type,
 		'S'
 	    )
 

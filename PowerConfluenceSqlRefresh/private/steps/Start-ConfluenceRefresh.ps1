@@ -1,23 +1,18 @@
 function Start-ConfluenceRefresh {
     [CmdletBinding()]
     param (
-        # Refresh type
-        [Parameter(Mandatory,Position=0)]
-        [string]
-        $RefreshType,
-
         # The sql instance to update data in
-        [Parameter(Mandatory,Position=1)]
+        [Parameter(Mandatory,Position=0)]
         [string]
         $SqlInstance,
 
         # The sql database to update data in
-        [Parameter(Mandatory,Position=2)]
+        [Parameter(Mandatory,Position=1)]
         [string]
         $SqlDatabase,
 
         # The schema to use when updating data
-        [Parameter(Position=3)]
+        [Parameter(Position=2)]
         [string]
         $SchemaName="dbo"
     )
@@ -28,7 +23,7 @@ function Start-ConfluenceRefresh {
     
     process {
         #invoke the sproc to start a refresh and return the id it gives us
-        (Invoke-SqlCmd -ServerInstance $SqlInstance -Database $SqlDatabase -Query "EXEC dbo.usp_Confluence_Refresh_Start $RefreshType").Refresh_Id
+        (Invoke-SqlCmd -ServerInstance $SqlInstance -Database $SqlDatabase -Query "EXEC dbo.usp_Confluence_Refresh_Start").Refresh_Id
     }
     
     end {
