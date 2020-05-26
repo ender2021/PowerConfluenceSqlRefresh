@@ -155,6 +155,23 @@ END
 GO
 IF @@ERROR <> 0 SET NOEXEC ON
 GO
+PRINT N'Creating [dbo].[tbl_Confluence_User]'
+GO
+CREATE TABLE [dbo].[tbl_Confluence_User]
+(
+[Account_Id] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Account_Type] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Display_Name] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Public_Name] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Profile_Picture_Url] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Profile_Picture_Height] [bigint] NULL,
+[Profile_Picture_Width] [bigint] NULL,
+[Email] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Refresh_Id] [int] NULL
+)
+GO
+IF @@ERROR <> 0 SET NOEXEC ON
+GO
 PRINT N'Creating [dbo].[usp_Confluence_Refresh_Clear_All]'
 GO
 
@@ -175,7 +192,7 @@ BEGIN
 	UPDATE [dbo].[tbl_Confluence_Refresh]
 	SET [Deleted] = 1
 
-	--TRUNCATE TABLE [dbo].[tbl_Confluence_Component]
+	TRUNCATE TABLE [dbo].[tbl_Confluence_User]
 	
 
 END
@@ -204,6 +221,23 @@ SELECT [Refresh_ID]
 GO
 IF @@ERROR <> 0 SET NOEXEC ON
 GO
+PRINT N'Creating [dbo].[tbl_stg_Confluence_User]'
+GO
+CREATE TABLE [dbo].[tbl_stg_Confluence_User]
+(
+[Account_Id] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Account_Type] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Display_Name] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Public_Name] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Profile_Picture_Url] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Profile_Picture_Height] [bigint] NULL,
+[Profile_Picture_Width] [bigint] NULL,
+[Email] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Refresh_Id] [int] NULL
+)
+GO
+IF @@ERROR <> 0 SET NOEXEC ON
+GO
 PRINT N'Creating [dbo].[usp_Confluence_Staging_Clear]'
 GO
 
@@ -219,12 +253,50 @@ AS
 BEGIN
 	SET NOCOUNT ON;
 
-    --TRUNCATE TABLE [dbo].[tbl_stg_Confluence_Component]
+    TRUNCATE TABLE [dbo].[tbl_stg_Confluence_User]
 
 
 END
 
 
+GO
+IF @@ERROR <> 0 SET NOEXEC ON
+GO
+PRINT N'Creating [dbo].[usp_Confluence_Staging_Sync_User]'
+GO
+-- =============================================
+-- Author:		Justin Mead
+-- Create date: 2020-05-25
+-- Description:	Synchronize Users table from staging to production
+-- =============================================
+CREATE PROCEDURE [dbo].[usp_Confluence_Staging_Sync_User] 
+AS
+BEGIN
+	DELETE FROM [dbo].[tbl_Confluence_User]
+
+	INSERT INTO [dbo].[tbl_Confluence_User]
+	(
+	    [Account_Id],
+	    [Account_Type],
+	    [Display_Name],
+	    [Public_Name],
+	    [Profile_Picture_Url],
+	    [Profile_Picture_Height],
+	    [Profile_Picture_Width],
+	    [Email],
+	    [Refresh_Id]
+	)
+	SELECT [Account_Id],
+           [Account_Type],
+           [Display_Name],
+           [Public_Name],
+           [Profile_Picture_Url],
+           [Profile_Picture_Height],
+           [Profile_Picture_Width],
+           [Email],
+           [Refresh_Id]
+	FROM [dbo].[tbl_stg_Confluence_User]
+END
 GO
 IF @@ERROR <> 0 SET NOEXEC ON
 GO
@@ -244,13 +316,33 @@ AS
 BEGIN
 	SET NOCOUNT ON;
 
-	--EXEC [dbo].[usp_Confluence_Staging_Sync_Component]
+	EXEC [dbo].[usp_Confluence_Staging_Sync_User]
 
 
 
 END
 
 
+GO
+IF @@ERROR <> 0 SET NOEXEC ON
+GO
+PRINT N'Creating [dbo].[vw_Confluence_User]'
+GO
+
+CREATE VIEW [dbo].[vw_Confluence_User] AS
+SELECT [Account_Id]
+      ,[Account_Type]
+      ,[Display_Name]
+      ,[Public_Name]
+      ,[Profile_Picture_Url]
+      ,[Profile_Picture_Height]
+      ,[Profile_Picture_Width]
+      ,[Email]
+	  ,CASE WHEN [Display_Name] LIKE '%(Unlicensed)%' OR [Display_Name] LIKE '%(Deactivated)%' THEN 0
+	        ELSE 1
+	   END AS [Active]
+      ,[Refresh_Id]
+  FROM [dbo].[tbl_Confluence_User]
 GO
 IF @@ERROR <> 0 SET NOEXEC ON
 GO
@@ -263,6 +355,12 @@ GO
 PRINT N'Adding foreign keys to [dbo].[tbl_lk_Confluence_Refresh_Status]'
 GO
 ALTER TABLE [dbo].[tbl_lk_Confluence_Refresh_Status] ADD CONSTRAINT [FK_tbl_lk_Confluence_Refresh_Status_tbl_lk_Confluence_Refresh_Status] FOREIGN KEY ([Refresh_Status_Code]) REFERENCES [dbo].[tbl_lk_Confluence_Refresh_Status] ([Refresh_Status_Code])
+GO
+IF @@ERROR <> 0 SET NOEXEC ON
+GO
+PRINT N'Altering permissions on  [dbo].[tbl_stg_Confluence_User]'
+GO
+GRANT INSERT ON  [dbo].[tbl_stg_Confluence_User] TO [ConfluenceRefreshRole]
 GO
 IF @@ERROR <> 0 SET NOEXEC ON
 GO
@@ -296,6 +394,12 @@ GRANT EXECUTE ON  [dbo].[usp_Confluence_Staging_Clear] TO [ConfluenceRefreshRole
 GO
 IF @@ERROR <> 0 SET NOEXEC ON
 GO
+PRINT N'Altering permissions on  [dbo].[usp_Confluence_Staging_Sync_User]'
+GO
+GRANT EXECUTE ON  [dbo].[usp_Confluence_Staging_Sync_User] TO [ConfluenceRefreshRole]
+GO
+IF @@ERROR <> 0 SET NOEXEC ON
+GO
 PRINT N'Altering permissions on  [dbo].[usp_Confluence_Staging_Synchronize]'
 GO
 GRANT EXECUTE ON  [dbo].[usp_Confluence_Staging_Synchronize] TO [ConfluenceRefreshRole]
@@ -305,6 +409,12 @@ GO
 PRINT N'Altering permissions on  [dbo].[vw_Confluence_Refresh]'
 GO
 GRANT SELECT ON  [dbo].[vw_Confluence_Refresh] TO [ConfluenceRefreshRole]
+GO
+IF @@ERROR <> 0 SET NOEXEC ON
+GO
+PRINT N'Altering permissions on  [dbo].[vw_Confluence_User]'
+GO
+GRANT SELECT ON  [dbo].[vw_Confluence_User] TO [ConfluenceRefreshRole]
 GO
 IF @@ERROR <> 0 SET NOEXEC ON
 GO

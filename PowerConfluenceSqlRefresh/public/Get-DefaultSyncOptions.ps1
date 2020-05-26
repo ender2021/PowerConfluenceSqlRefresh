@@ -21,7 +21,7 @@ function Get-DefaultSyncOptions {
     
     process {
         @{
-            
+            Users = $true
         }
     }
     

@@ -96,7 +96,7 @@ function Update-ConfluenceSql {
         ####################################################
 
         Clear-ConfluenceStaging @sqlSplat
-        $refreshId = Start-ConfluenceRefresh -RefreshType @sqlSplat
+        $refreshId = Start-ConfluenceRefresh @sqlSplat
     }
     
     process {
@@ -120,7 +120,7 @@ function Update-ConfluenceSql {
         # if ($options.Resolutions) { Update-JiraResolutions @refreshSplat } else { Write-Verbose "Skipping Resolutions" }
         # if ($options.Priorities) { Update-JiraPriorities @refreshSplat } else { Write-Verbose "Skipping Priorities" }
         # if ($options.IssueLinkTypes) { Update-JiraIssueLinkTypes @refreshSplat } else { Write-Verbose "Skipping Issue Link Types" }
-        # if ($options.Users) { Update-JiraUsers @refreshSplat } else { Write-Verbose "Skipping Users" }
+        if ($options.Users) { Update-ConfluenceUsers @refreshSplat } else { Write-Verbose "Skipping Users" }
 
         
         
@@ -130,7 +130,7 @@ function Update-ConfluenceSql {
         ####################################################
 
         #perform the sync
-        Sync-ConfluenceStaging -SyncDeleted $syncDelete @sqlSplat
+        Sync-ConfluenceStaging @sqlSplat
     }
     
     end {
