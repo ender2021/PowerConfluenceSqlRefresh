@@ -9,10 +9,10 @@
 @{
 
 # Script module or binary module file associated with this manifest.
-# RootModule = ''
+RootModule = 'PowerConfluenceSqlRefresh.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.0.1'
+ModuleVersion = '1.0.0'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -54,7 +54,7 @@ PowerShellVersion = '6.1'
 RequiredModules = @(
     @{
         ModuleName="PowerConfluence"
-        ModuleVersion="0.1.0"
+        ModuleVersion="0.1.1"
         Guid="6e741953-480d-44fb-9e1c-117f0747cca1"
     },
     @{
