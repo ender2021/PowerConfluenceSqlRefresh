@@ -183,6 +183,23 @@ CREATE TABLE [dbo].[tbl_Confluence_User]
 GO
 IF @@ERROR <> 0 SET NOEXEC ON
 GO
+PRINT N'Creating [dbo].[tbl_Confluence_Space_Permission]'
+GO
+CREATE TABLE [dbo].[tbl_Confluence_Space_Permission]
+(
+[Permission_Id] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Space_Id] [int] NULL,
+[Subject_Type] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Subject_Id] [sql_variant] NULL,
+[Operation] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Target_Type] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Anonymous_Access] [bit] NULL,
+[Unlicensed_Access] [bit] NULL,
+[Refresh_Id] [int] NULL
+)
+GO
+IF @@ERROR <> 0 SET NOEXEC ON
+GO
 PRINT N'Creating [dbo].[tbl_Confluence_Space]'
 GO
 CREATE TABLE [dbo].[tbl_Confluence_Space]
@@ -233,6 +250,7 @@ BEGIN
 
 	TRUNCATE TABLE [dbo].[tbl_Confluence_Group]
 	TRUNCATE TABLE [dbo].[tbl_Confluence_Space]
+	TRUNCATE TABLE [dbo].[tbl_Confluence_Space_Permission]
 	TRUNCATE TABLE [dbo].[tbl_Confluence_User]
 	TRUNCATE TABLE [dbo].[tbl_Confluence_User_Group]
 
@@ -247,6 +265,7 @@ GO
 PRINT N'Creating [dbo].[vw_Confluence_Refresh]'
 GO
 
+
 CREATE VIEW [dbo].[vw_Confluence_Refresh]
 AS
 SELECT [Refresh_ID]
@@ -255,7 +274,6 @@ SELECT [Refresh_ID]
       ,[Refresh_End]
       ,[Refresh_End_Unix]
 	  ,CAST(DATEDIFF(SECOND, [Refresh_Start], [Refresh_End]) AS FLOAT) / 60 AS [Duration_Minutes]
-      ,[Type]
       ,[Status]
       ,[Deleted]
   FROM [dbo].[tbl_Confluence_Refresh]
@@ -285,6 +303,23 @@ CREATE TABLE [dbo].[tbl_stg_Confluence_User]
 [Profile_Picture_Height] [bigint] NULL,
 [Profile_Picture_Width] [bigint] NULL,
 [Email] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Refresh_Id] [int] NULL
+)
+GO
+IF @@ERROR <> 0 SET NOEXEC ON
+GO
+PRINT N'Creating [dbo].[tbl_stg_Confluence_Space_Permission]'
+GO
+CREATE TABLE [dbo].[tbl_stg_Confluence_Space_Permission]
+(
+[Permission_Id] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Space_Id] [int] NULL,
+[Subject_Type] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Subject_Id] [sql_variant] NULL,
+[Operation] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Target_Type] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Anonymous_Access] [bit] NULL,
+[Unlicensed_Access] [bit] NULL,
 [Refresh_Id] [int] NULL
 )
 GO
@@ -335,6 +370,7 @@ BEGIN
 
     TRUNCATE TABLE [dbo].[tbl_stg_Confluence_Group]
     TRUNCATE TABLE [dbo].[tbl_stg_Confluence_Space]
+    TRUNCATE TABLE [dbo].[tbl_stg_Confluence_Space_Permission]
     TRUNCATE TABLE [dbo].[tbl_stg_Confluence_User]
     TRUNCATE TABLE [dbo].[tbl_stg_Confluence_User_Group]
 
@@ -405,6 +441,44 @@ BEGIN
            [Email],
            [Refresh_Id]
 	FROM [dbo].[tbl_stg_Confluence_User]
+END
+GO
+IF @@ERROR <> 0 SET NOEXEC ON
+GO
+PRINT N'Creating [dbo].[usp_Confluence_Staging_Sync_Space_Permission]'
+GO
+-- =============================================
+-- Author:		Justin Mead
+-- Create date: 2020-05-26
+-- Description:	Synchronize Space Permission table from staging to production
+-- =============================================
+CREATE PROCEDURE [dbo].[usp_Confluence_Staging_Sync_Space_Permission] 
+AS
+BEGIN
+	DELETE FROM [dbo].[tbl_Confluence_Space_Permission]
+
+	INSERT INTO [dbo].[tbl_Confluence_Space_Permission]
+	(
+	    [Permission_Id],
+	    [Space_Id],
+	    [Subject_Type],
+	    [Subject_Id],
+	    [Operation],
+	    [Target_Type],
+	    [Anonymous_Access],
+	    [Unlicensed_Access],
+	    [Refresh_Id]
+	)
+	SELECT [Permission_Id],
+           [Space_Id],
+           [Subject_Type],
+           [Subject_Id],
+           [Operation],
+           [Target_Type],
+           [Anonymous_Access],
+           [Unlicensed_Access],
+           [Refresh_Id]
+	FROM [dbo].[tbl_stg_Confluence_Space_Permission]
 END
 GO
 IF @@ERROR <> 0 SET NOEXEC ON
@@ -491,6 +565,7 @@ BEGIN
 
 	EXEC [dbo].[usp_Confluence_Staging_Sync_Group]
 	EXEC [dbo].[usp_Confluence_Staging_Sync_Space]
+	EXEC [dbo].[usp_Confluence_Staging_Sync_Space_Permission]
 	EXEC [dbo].[usp_Confluence_Staging_Sync_User]
 	EXEC [dbo].[usp_Confluence_Staging_Sync_User_Group]
 
@@ -559,6 +634,23 @@ FROM [dbo].[tbl_Confluence_Space]
 GO
 IF @@ERROR <> 0 SET NOEXEC ON
 GO
+PRINT N'Creating [dbo].[vw_Confluence_Space_Permission]'
+GO
+
+CREATE VIEW [dbo].[vw_Confluence_Space_Permission] AS
+SELECT [Permission_Id],
+       [Space_Id],
+       [Subject_Type],
+       [Subject_Id],
+       [Operation],
+       [Target_Type],
+       [Anonymous_Access],
+       [Unlicensed_Access],
+       [Refresh_Id]
+FROM [dbo].[tbl_Confluence_Space_Permission]
+GO
+IF @@ERROR <> 0 SET NOEXEC ON
+GO
 PRINT N'Adding foreign keys to [dbo].[tbl_Confluence_Refresh]'
 GO
 ALTER TABLE [dbo].[tbl_Confluence_Refresh] ADD CONSTRAINT [FK_tbl_Confluence_Refresh_tbl_lk_Confluence_Refresh_Status] FOREIGN KEY ([Status]) REFERENCES [dbo].[tbl_lk_Confluence_Refresh_Status] ([Refresh_Status_Code])
@@ -580,6 +672,12 @@ GO
 PRINT N'Altering permissions on  [dbo].[tbl_stg_Confluence_Space]'
 GO
 GRANT INSERT ON  [dbo].[tbl_stg_Confluence_Space] TO [ConfluenceRefreshRole]
+GO
+IF @@ERROR <> 0 SET NOEXEC ON
+GO
+PRINT N'Altering permissions on  [dbo].[tbl_stg_Confluence_Space_Permission]'
+GO
+GRANT INSERT ON  [dbo].[tbl_stg_Confluence_Space_Permission] TO [ConfluenceRefreshRole]
 GO
 IF @@ERROR <> 0 SET NOEXEC ON
 GO
@@ -637,6 +735,12 @@ GRANT EXECUTE ON  [dbo].[usp_Confluence_Staging_Sync_Space] TO [ConfluenceRefres
 GO
 IF @@ERROR <> 0 SET NOEXEC ON
 GO
+PRINT N'Altering permissions on  [dbo].[usp_Confluence_Staging_Sync_Space_Permission]'
+GO
+GRANT EXECUTE ON  [dbo].[usp_Confluence_Staging_Sync_Space_Permission] TO [ConfluenceRefreshRole]
+GO
+IF @@ERROR <> 0 SET NOEXEC ON
+GO
 PRINT N'Altering permissions on  [dbo].[usp_Confluence_Staging_Sync_User]'
 GO
 GRANT EXECUTE ON  [dbo].[usp_Confluence_Staging_Sync_User] TO [ConfluenceRefreshRole]
@@ -670,6 +774,12 @@ GO
 PRINT N'Altering permissions on  [dbo].[vw_Confluence_Space]'
 GO
 GRANT SELECT ON  [dbo].[vw_Confluence_Space] TO [ConfluenceRefreshRole]
+GO
+IF @@ERROR <> 0 SET NOEXEC ON
+GO
+PRINT N'Altering permissions on  [dbo].[vw_Confluence_Space_Permission]'
+GO
+GRANT SELECT ON  [dbo].[vw_Confluence_Space_Permission] TO [ConfluenceRefreshRole]
 GO
 IF @@ERROR <> 0 SET NOEXEC ON
 GO

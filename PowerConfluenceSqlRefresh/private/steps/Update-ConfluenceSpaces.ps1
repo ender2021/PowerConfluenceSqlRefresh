@@ -37,7 +37,11 @@ function Update-ConfluenceSpaces {
         Write-Verbose "Updating Spaces"
         $spaceTableName = "tbl_stg_Confluence_Space"
         $spaces = @()
+
+        $permissionTableName = "tbl_stg_Confluence_Space_Permission"
+        $permissions = @()
         $getPermissions = $null -ne $SyncOptions -and $SyncOptions.ContainsKey("Permissions") -and $SyncOptions.Permissions -ne $false
+        if (!$getPermissions) { Write-Verbose "Skipping Space Permissions" }
     }
     
     process {
@@ -54,23 +58,27 @@ function Update-ConfluenceSpaces {
                 Expand = @("icon")
             }
             if ($null -ne $SpaceKeys -and $SpaceKeys.Count -gt 0) { $restParams.Add("SpaceKeys", $SpaceKeys) }
-            if ($getPermissions) { $restParams.Expand.Add("permissions") }
+            if ($getPermissions) { $restParams.Expand += "permissions" }
             $results = Invoke-ConfluenceGetSpaces @restParams
 
             #map spaces
-            $mappedSpaces = $results.results | Read-ConfluenceSpace -RefreshId $RefreshId
+            $mappedSpaces = $results.results | Read-ConfluenceSpace -RefreshId $RefreshId -ReadPermissions:$getPermissions
 
-            #add to list, checking for duplicates
+            #look for and remove duplicates
             $existingKeys = @()
             $existingKeys += $spaces | ForEach-Object { $_.Space_Key }
             $newSpaces = $mappedSpaces | Where-Object { $existingKeys -notcontains $_.Space_Key }
-            $spaces += $newSpaces
 
             #handle permissions storage, if configured
             if ($getPermissions) {
-                #TODO: add permission storage handling
+                #get the permissions objects, then remove the property from the space objects so it's not written to the db
+                $permissions += $newSpaces | ForEach-Object { $_.Permissions }
+                $newSpaces = $newSpaces | Select-Object -ExcludeProperty Permissions
             }
-            
+
+            #add space results to master list, checking for duplicates
+            $spaces += $newSpaces
+
             #check how many results came back
             $returnCount = $results.size
 
@@ -82,7 +90,14 @@ function Update-ConfluenceSpaces {
     }
     
     end {
-        Write-Verbose "Writing Spaces to staging table"
-        $spaces | Write-SqlTableData -ServerInstance $SqlInstance -DatabaseName $SqlDatabase -SchemaName $SchemaName -TableName $spaceTableName -Force
+        $spacesCount = $spaces.Count
+        Write-Verbose "Writing $spacesCount Space record(s) to staging table"
+        $spaces | Write-SqlTableData -ServerInstance $SqlInstance -DatabaseName $SqlDatabase -SchemaName $SchemaName -TableName $spaceTableName
+        
+        if ($getPermissions) {
+            $permissionsCount = $permissions.Count
+            Write-Verbose "Writing $permissionsCount Space Permission record(s) to staging table"
+            $permissions | Write-SqlTableData -ServerInstance $SqlInstance -DatabaseName $SqlDatabase -SchemaName $SchemaName -TableName $permissionTableName
+        }
     }
 }

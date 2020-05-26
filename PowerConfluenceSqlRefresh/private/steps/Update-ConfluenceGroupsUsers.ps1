@@ -42,7 +42,8 @@ function Update-ConfluenceGroupsUsers {
     }
     
     end {
-        Write-Verbose "Writing Groups' Users to staging table"
+        $usersGroupsCount = $userGroups.Count
+        Write-Verbose "Writing $usersGroupsCount Groups' Users record(s) to staging table"
         $userGroups | Write-SqlTableData -ServerInstance $SqlInstance -DatabaseName $SqlDatabase -SchemaName $SchemaName -TableName $tableName
     }
 }
