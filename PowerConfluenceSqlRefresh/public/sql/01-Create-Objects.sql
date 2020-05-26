@@ -172,6 +172,17 @@ CREATE TABLE [dbo].[tbl_Confluence_User]
 GO
 IF @@ERROR <> 0 SET NOEXEC ON
 GO
+PRINT N'Creating [dbo].[tbl_Confluence_Group]'
+GO
+CREATE TABLE [dbo].[tbl_Confluence_Group]
+(
+[Group_Name] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Group_Id] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Refresh_Id] [int] NULL
+)
+GO
+IF @@ERROR <> 0 SET NOEXEC ON
+GO
 PRINT N'Creating [dbo].[usp_Confluence_Refresh_Clear_All]'
 GO
 
@@ -192,8 +203,8 @@ BEGIN
 	UPDATE [dbo].[tbl_Confluence_Refresh]
 	SET [Deleted] = 1
 
+	TRUNCATE TABLE [dbo].[tbl_Confluence_Group]
 	TRUNCATE TABLE [dbo].[tbl_Confluence_User]
-	
 
 END
 
@@ -238,6 +249,17 @@ CREATE TABLE [dbo].[tbl_stg_Confluence_User]
 GO
 IF @@ERROR <> 0 SET NOEXEC ON
 GO
+PRINT N'Creating [dbo].[tbl_stg_Confluence_Group]'
+GO
+CREATE TABLE [dbo].[tbl_stg_Confluence_Group]
+(
+[Group_Name] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Group_Id] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Refresh_Id] [int] NULL
+)
+GO
+IF @@ERROR <> 0 SET NOEXEC ON
+GO
 PRINT N'Creating [dbo].[usp_Confluence_Staging_Clear]'
 GO
 
@@ -254,6 +276,7 @@ BEGIN
 	SET NOCOUNT ON;
 
     TRUNCATE TABLE [dbo].[tbl_stg_Confluence_User]
+    TRUNCATE TABLE [dbo].[tbl_stg_Confluence_Group]
 
 
 END
@@ -300,6 +323,32 @@ END
 GO
 IF @@ERROR <> 0 SET NOEXEC ON
 GO
+PRINT N'Creating [dbo].[usp_Confluence_Staging_Sync_Group]'
+GO
+-- =============================================
+-- Author:		Justin Mead
+-- Create date: 2020-05-25
+-- Description:	Synchronize Groups table from staging to production
+-- =============================================
+CREATE PROCEDURE [dbo].[usp_Confluence_Staging_Sync_Group] 
+AS
+BEGIN
+	DELETE FROM [dbo].[tbl_Confluence_Group]
+
+	INSERT INTO [dbo].[tbl_Confluence_Group]
+	(
+	    [Group_Name],
+	    [Group_Id],
+	    [Refresh_Id]
+	)
+	SELECT [Group_Name],
+           [Group_Id],
+           [Refresh_Id]
+	FROM [dbo].[tbl_stg_Confluence_Group]
+END
+GO
+IF @@ERROR <> 0 SET NOEXEC ON
+GO
 PRINT N'Creating [dbo].[usp_Confluence_Staging_Synchronize]'
 GO
 
@@ -316,9 +365,8 @@ AS
 BEGIN
 	SET NOCOUNT ON;
 
+	EXEC [dbo].[usp_Confluence_Staging_Sync_Group]
 	EXEC [dbo].[usp_Confluence_Staging_Sync_User]
-
-
 
 END
 
@@ -346,6 +394,17 @@ SELECT [Account_Id]
 GO
 IF @@ERROR <> 0 SET NOEXEC ON
 GO
+PRINT N'Creating [dbo].[vw_Confluence_Group]'
+GO
+
+CREATE VIEW [dbo].[vw_Confluence_Group] AS
+SELECT [Group_Name],
+       [Group_Id],
+       [Refresh_Id]
+FROM [dbo].[tbl_Confluence_Group]
+GO
+IF @@ERROR <> 0 SET NOEXEC ON
+GO
 PRINT N'Adding foreign keys to [dbo].[tbl_Confluence_Refresh]'
 GO
 ALTER TABLE [dbo].[tbl_Confluence_Refresh] ADD CONSTRAINT [FK_tbl_Confluence_Refresh_tbl_lk_Confluence_Refresh_Status] FOREIGN KEY ([Status]) REFERENCES [dbo].[tbl_lk_Confluence_Refresh_Status] ([Refresh_Status_Code])
@@ -355,6 +414,12 @@ GO
 PRINT N'Adding foreign keys to [dbo].[tbl_lk_Confluence_Refresh_Status]'
 GO
 ALTER TABLE [dbo].[tbl_lk_Confluence_Refresh_Status] ADD CONSTRAINT [FK_tbl_lk_Confluence_Refresh_Status_tbl_lk_Confluence_Refresh_Status] FOREIGN KEY ([Refresh_Status_Code]) REFERENCES [dbo].[tbl_lk_Confluence_Refresh_Status] ([Refresh_Status_Code])
+GO
+IF @@ERROR <> 0 SET NOEXEC ON
+GO
+PRINT N'Altering permissions on  [dbo].[tbl_stg_Confluence_Group]'
+GO
+GRANT INSERT ON  [dbo].[tbl_stg_Confluence_Group] TO [ConfluenceRefreshRole]
 GO
 IF @@ERROR <> 0 SET NOEXEC ON
 GO
@@ -394,6 +459,12 @@ GRANT EXECUTE ON  [dbo].[usp_Confluence_Staging_Clear] TO [ConfluenceRefreshRole
 GO
 IF @@ERROR <> 0 SET NOEXEC ON
 GO
+PRINT N'Altering permissions on  [dbo].[usp_Confluence_Staging_Sync_Group]'
+GO
+GRANT EXECUTE ON  [dbo].[usp_Confluence_Staging_Sync_Group] TO [ConfluenceRefreshRole]
+GO
+IF @@ERROR <> 0 SET NOEXEC ON
+GO
 PRINT N'Altering permissions on  [dbo].[usp_Confluence_Staging_Sync_User]'
 GO
 GRANT EXECUTE ON  [dbo].[usp_Confluence_Staging_Sync_User] TO [ConfluenceRefreshRole]
@@ -403,6 +474,12 @@ GO
 PRINT N'Altering permissions on  [dbo].[usp_Confluence_Staging_Synchronize]'
 GO
 GRANT EXECUTE ON  [dbo].[usp_Confluence_Staging_Synchronize] TO [ConfluenceRefreshRole]
+GO
+IF @@ERROR <> 0 SET NOEXEC ON
+GO
+PRINT N'Altering permissions on  [dbo].[vw_Confluence_Group]'
+GO
+GRANT SELECT ON  [dbo].[vw_Confluence_Group] TO [ConfluenceRefreshRole]
 GO
 IF @@ERROR <> 0 SET NOEXEC ON
 GO

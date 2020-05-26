@@ -20,8 +20,8 @@ BEGIN
 	UPDATE [dbo].[tbl_Confluence_Refresh]
 	SET [Deleted] = 1
 
+	TRUNCATE TABLE [dbo].[tbl_Confluence_Group]
 	TRUNCATE TABLE [dbo].[tbl_Confluence_User]
-	
 
 END
 

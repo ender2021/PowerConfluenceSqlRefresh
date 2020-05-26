@@ -16,6 +16,7 @@ BEGIN
 	SET NOCOUNT ON;
 
     TRUNCATE TABLE [dbo].[tbl_stg_Confluence_User]
+    TRUNCATE TABLE [dbo].[tbl_stg_Confluence_Group]
 
 
 END

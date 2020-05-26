@@ -121,6 +121,7 @@ function Update-ConfluenceSql {
         # if ($options.Priorities) { Update-JiraPriorities @refreshSplat } else { Write-Verbose "Skipping Priorities" }
         # if ($options.IssueLinkTypes) { Update-JiraIssueLinkTypes @refreshSplat } else { Write-Verbose "Skipping Issue Link Types" }
         if ($options.Users) { Update-ConfluenceUsers @refreshSplat } else { Write-Verbose "Skipping Users" }
+        if ($options.Groups) { Update-ConfluenceGroups @refreshSplat } else { Write-Verbose "Skipping Groups" }
 
         
         
