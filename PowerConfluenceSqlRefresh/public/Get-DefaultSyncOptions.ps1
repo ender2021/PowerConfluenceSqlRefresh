@@ -22,7 +22,10 @@ function Get-DefaultSyncOptions {
     process {
         @{
             Users = $true
-            Groups = $true
+            Groups = @{
+                Groups = $true
+                Users = $true
+            }
         }
     }
     

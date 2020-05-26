@@ -60,5 +60,6 @@ function Update-ConfluenceGroups {
     end {
         Write-Verbose "Writing Groups to staging table"
         $groups | Write-SqlTableData -ServerInstance $SqlInstance -DatabaseName $SqlDatabase -SchemaName $SchemaName -TableName $tableName
+        return $groups
     }
 }

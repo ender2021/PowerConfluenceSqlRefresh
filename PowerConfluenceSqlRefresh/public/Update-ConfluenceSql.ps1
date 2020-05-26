@@ -121,7 +121,10 @@ function Update-ConfluenceSql {
         # if ($options.Priorities) { Update-JiraPriorities @refreshSplat } else { Write-Verbose "Skipping Priorities" }
         # if ($options.IssueLinkTypes) { Update-JiraIssueLinkTypes @refreshSplat } else { Write-Verbose "Skipping Issue Link Types" }
         if ($options.Users) { Update-ConfluenceUsers @refreshSplat } else { Write-Verbose "Skipping Users" }
-        if ($options.Groups) { Update-ConfluenceGroups @refreshSplat } else { Write-Verbose "Skipping Groups" }
+        if ($options.Groups.Groups) {
+            $groups = Update-ConfluenceGroups @refreshSplat | ForEach-Object { $_.Group_Name }
+            if ($options.Groups.Users) { Update-ConfluenceGroupsUsers $groups @refreshSplat } else { Write-Verbose "Skipping Groups' Users" }
+        } else { Write-Verbose "Skipping Groups" }
 
         
         

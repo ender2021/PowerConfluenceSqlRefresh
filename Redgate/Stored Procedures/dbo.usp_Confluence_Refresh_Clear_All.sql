@@ -22,6 +22,7 @@ BEGIN
 
 	TRUNCATE TABLE [dbo].[tbl_Confluence_Group]
 	TRUNCATE TABLE [dbo].[tbl_Confluence_User]
+	TRUNCATE TABLE [dbo].[tbl_Confluence_User_Group]
 
 END
 
