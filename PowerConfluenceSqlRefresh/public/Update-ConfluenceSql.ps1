@@ -110,24 +110,23 @@ function Update-ConfluenceSql {
         } + $sqlSplat
 
         ####################################################
-        #  REFRESH STEP 1 - NO CONTEXT DATA                #
+        #  REFRESH STEP 1 - USERS / GROUPS                 #
         ####################################################
 
-        # these are mostly lookup tables
-        # if ($options.ProjectCategories) { Update-JiraProjectCategories @refreshSplat } else { Write-Verbose "Skipping Project Categories" }
-        # if ($options.StatusCategories) { Update-JiraStatusCategories @refreshSplat } else { Write-Verbose "Skipping Status Categories" }
-        # if ($options.Statuses) { Update-JiraStatuses @refreshSplat } else { Write-Verbose "Skipping Statuses" }
-        # if ($options.Resolutions) { Update-JiraResolutions @refreshSplat } else { Write-Verbose "Skipping Resolutions" }
-        # if ($options.Priorities) { Update-JiraPriorities @refreshSplat } else { Write-Verbose "Skipping Priorities" }
-        # if ($options.IssueLinkTypes) { Update-JiraIssueLinkTypes @refreshSplat } else { Write-Verbose "Skipping Issue Link Types" }
-        if ($options.Users) { Update-ConfluenceUsers @refreshSplat } else { Write-Verbose "Skipping Users" }
-        if ($options.Groups.Groups) {
+        if ($options.ContainsKey("Users") -and $options.Users -ne $false) { Update-ConfluenceUsers @refreshSplat } else { Write-Verbose "Skipping Users" }
+        if ($options.ContainsKey("Groups") -and $options.Groups -ne $false) {
             $groups = Update-ConfluenceGroups @refreshSplat | ForEach-Object { $_.Group_Name }
-            if ($options.Groups.Users) { Update-ConfluenceGroupsUsers $groups @refreshSplat } else { Write-Verbose "Skipping Groups' Users" }
+            if ($options.Groups.ContainsKey("Users") -and $options.Groups.Users -ne $false) { Update-ConfluenceGroupsUsers $groups @refreshSplat } else { Write-Verbose "Skipping Groups' Users" }
         } else { Write-Verbose "Skipping Groups" }
 
-        
-        
+        ####################################################
+        #  REFRESH STEP 2 - SPACES                         #
+        ####################################################
+
+        if ($options.ContainsKey("Spaces") -and $options.Spaces -ne $false) {
+            $settings = IIF ($options.Spaces.GetType().Name -eq "Hashtable") $options.Spaces $null
+            Update-ConfluenceSpaces $SpaceKeys $settings @refreshSplat
+        } else { Write-Verbose "Skipping Users" }
 
         ####################################################
         #  REFRESH STEP X - SYNC STAGING TO LIVE TABLES    #

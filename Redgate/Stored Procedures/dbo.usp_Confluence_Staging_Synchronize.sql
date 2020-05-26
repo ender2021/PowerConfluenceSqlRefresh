@@ -17,6 +17,7 @@ BEGIN
 	SET NOCOUNT ON;
 
 	EXEC [dbo].[usp_Confluence_Staging_Sync_Group]
+	EXEC [dbo].[usp_Confluence_Staging_Sync_Space]
 	EXEC [dbo].[usp_Confluence_Staging_Sync_User]
 	EXEC [dbo].[usp_Confluence_Staging_Sync_User_Group]
 

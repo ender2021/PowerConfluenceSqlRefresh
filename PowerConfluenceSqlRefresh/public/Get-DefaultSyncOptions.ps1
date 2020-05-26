@@ -23,9 +23,9 @@ function Get-DefaultSyncOptions {
         @{
             Users = $true
             Groups = @{
-                Groups = $true
                 Users = $true
             }
+            Spaces = $true
         }
     }
     

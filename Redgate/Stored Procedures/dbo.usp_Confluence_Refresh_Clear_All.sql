@@ -21,6 +21,7 @@ BEGIN
 	SET [Deleted] = 1
 
 	TRUNCATE TABLE [dbo].[tbl_Confluence_Group]
+	TRUNCATE TABLE [dbo].[tbl_Confluence_Space]
 	TRUNCATE TABLE [dbo].[tbl_Confluence_User]
 	TRUNCATE TABLE [dbo].[tbl_Confluence_User_Group]
 

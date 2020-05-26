@@ -183,6 +183,23 @@ CREATE TABLE [dbo].[tbl_Confluence_User]
 GO
 IF @@ERROR <> 0 SET NOEXEC ON
 GO
+PRINT N'Creating [dbo].[tbl_Confluence_Space]'
+GO
+CREATE TABLE [dbo].[tbl_Confluence_Space]
+(
+[Space_Id] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Space_Key] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Name] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Type] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Status] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Icon_Url] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Icon_Height] [bigint] NULL,
+[Icon_Width] [bigint] NULL,
+[Refresh_Id] [int] NULL
+)
+GO
+IF @@ERROR <> 0 SET NOEXEC ON
+GO
 PRINT N'Creating [dbo].[tbl_Confluence_Group]'
 GO
 CREATE TABLE [dbo].[tbl_Confluence_Group]
@@ -215,6 +232,7 @@ BEGIN
 	SET [Deleted] = 1
 
 	TRUNCATE TABLE [dbo].[tbl_Confluence_Group]
+	TRUNCATE TABLE [dbo].[tbl_Confluence_Space]
 	TRUNCATE TABLE [dbo].[tbl_Confluence_User]
 	TRUNCATE TABLE [dbo].[tbl_Confluence_User_Group]
 
@@ -272,6 +290,23 @@ CREATE TABLE [dbo].[tbl_stg_Confluence_User]
 GO
 IF @@ERROR <> 0 SET NOEXEC ON
 GO
+PRINT N'Creating [dbo].[tbl_stg_Confluence_Space]'
+GO
+CREATE TABLE [dbo].[tbl_stg_Confluence_Space]
+(
+[Space_Id] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Space_Key] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Name] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Type] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Status] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Icon_Url] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Icon_Height] [bigint] NULL,
+[Icon_Width] [bigint] NULL,
+[Refresh_Id] [int] NULL
+)
+GO
+IF @@ERROR <> 0 SET NOEXEC ON
+GO
 PRINT N'Creating [dbo].[tbl_stg_Confluence_Group]'
 GO
 CREATE TABLE [dbo].[tbl_stg_Confluence_Group]
@@ -299,6 +334,7 @@ BEGIN
 	SET NOCOUNT ON;
 
     TRUNCATE TABLE [dbo].[tbl_stg_Confluence_Group]
+    TRUNCATE TABLE [dbo].[tbl_stg_Confluence_Space]
     TRUNCATE TABLE [dbo].[tbl_stg_Confluence_User]
     TRUNCATE TABLE [dbo].[tbl_stg_Confluence_User_Group]
 
@@ -373,6 +409,44 @@ END
 GO
 IF @@ERROR <> 0 SET NOEXEC ON
 GO
+PRINT N'Creating [dbo].[usp_Confluence_Staging_Sync_Space]'
+GO
+-- =============================================
+-- Author:		Justin Mead
+-- Create date: 2020-05-26
+-- Description:	Synchronize Space table from staging to production
+-- =============================================
+CREATE PROCEDURE [dbo].[usp_Confluence_Staging_Sync_Space] 
+AS
+BEGIN
+	DELETE FROM [dbo].[tbl_Confluence_Space]
+
+	INSERT INTO [dbo].[tbl_Confluence_Space]
+	(
+	    [Space_Id],
+	    [Space_Key],
+	    [Name],
+	    [Type],
+	    [Status],
+	    [Icon_Url],
+	    [Icon_Height],
+	    [Icon_Width],
+	    [Refresh_Id]
+	)
+	SELECT [Space_Id],
+           [Space_Key],
+           [Name],
+           [Type],
+           [Status],
+           [Icon_Url],
+           [Icon_Height],
+           [Icon_Width],
+           [Refresh_Id]
+	FROM [dbo].[tbl_Confluence_Space]
+END
+GO
+IF @@ERROR <> 0 SET NOEXEC ON
+GO
 PRINT N'Creating [dbo].[usp_Confluence_Staging_Sync_Group]'
 GO
 -- =============================================
@@ -416,6 +490,7 @@ BEGIN
 	SET NOCOUNT ON;
 
 	EXEC [dbo].[usp_Confluence_Staging_Sync_Group]
+	EXEC [dbo].[usp_Confluence_Staging_Sync_Space]
 	EXEC [dbo].[usp_Confluence_Staging_Sync_User]
 	EXEC [dbo].[usp_Confluence_Staging_Sync_User_Group]
 
@@ -467,6 +542,23 @@ FROM [dbo].[tbl_Confluence_User_Group]
 GO
 IF @@ERROR <> 0 SET NOEXEC ON
 GO
+PRINT N'Creating [dbo].[vw_Confluence_Space]'
+GO
+
+CREATE VIEW [dbo].[vw_Confluence_Space] AS
+SELECT [Space_Id],
+       [Space_Key],
+       [Name],
+       [Type],
+       [Status],
+       [Icon_Url],
+       [Icon_Height],
+       [Icon_Width],
+       [Refresh_Id]
+FROM [dbo].[tbl_Confluence_Space]
+GO
+IF @@ERROR <> 0 SET NOEXEC ON
+GO
 PRINT N'Adding foreign keys to [dbo].[tbl_Confluence_Refresh]'
 GO
 ALTER TABLE [dbo].[tbl_Confluence_Refresh] ADD CONSTRAINT [FK_tbl_Confluence_Refresh_tbl_lk_Confluence_Refresh_Status] FOREIGN KEY ([Status]) REFERENCES [dbo].[tbl_lk_Confluence_Refresh_Status] ([Refresh_Status_Code])
@@ -482,6 +574,12 @@ GO
 PRINT N'Altering permissions on  [dbo].[tbl_stg_Confluence_Group]'
 GO
 GRANT INSERT ON  [dbo].[tbl_stg_Confluence_Group] TO [ConfluenceRefreshRole]
+GO
+IF @@ERROR <> 0 SET NOEXEC ON
+GO
+PRINT N'Altering permissions on  [dbo].[tbl_stg_Confluence_Space]'
+GO
+GRANT INSERT ON  [dbo].[tbl_stg_Confluence_Space] TO [ConfluenceRefreshRole]
 GO
 IF @@ERROR <> 0 SET NOEXEC ON
 GO
@@ -533,6 +631,12 @@ GRANT EXECUTE ON  [dbo].[usp_Confluence_Staging_Sync_Group] TO [ConfluenceRefres
 GO
 IF @@ERROR <> 0 SET NOEXEC ON
 GO
+PRINT N'Altering permissions on  [dbo].[usp_Confluence_Staging_Sync_Space]'
+GO
+GRANT EXECUTE ON  [dbo].[usp_Confluence_Staging_Sync_Space] TO [ConfluenceRefreshRole]
+GO
+IF @@ERROR <> 0 SET NOEXEC ON
+GO
 PRINT N'Altering permissions on  [dbo].[usp_Confluence_Staging_Sync_User]'
 GO
 GRANT EXECUTE ON  [dbo].[usp_Confluence_Staging_Sync_User] TO [ConfluenceRefreshRole]
@@ -560,6 +664,12 @@ GO
 PRINT N'Altering permissions on  [dbo].[vw_Confluence_Refresh]'
 GO
 GRANT SELECT ON  [dbo].[vw_Confluence_Refresh] TO [ConfluenceRefreshRole]
+GO
+IF @@ERROR <> 0 SET NOEXEC ON
+GO
+PRINT N'Altering permissions on  [dbo].[vw_Confluence_Space]'
+GO
+GRANT SELECT ON  [dbo].[vw_Confluence_Space] TO [ConfluenceRefreshRole]
 GO
 IF @@ERROR <> 0 SET NOEXEC ON
 GO
