@@ -9,7 +9,7 @@
     Retrieve this object and modify the values, then supply it to Update-ConfluenceSql to modify the default settings
 
 #>
-function Get-DefaultSyncOptions {
+function Get-DefaultConfluenceSyncOptions {
     [CmdletBinding()]
     param (
         

@@ -78,7 +78,7 @@ function Update-ConfluenceSql {
         }
 
         #setup the sync options
-        $options = Get-DefaultSyncOptions
+        $options = Get-DefaultConfluenceSyncOptions
         if ($SyncOptions) {
             $options = Merge-Hashtable -Source $SyncOptions -Target $options
         }
