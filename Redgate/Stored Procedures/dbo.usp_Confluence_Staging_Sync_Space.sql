@@ -33,7 +33,7 @@ BEGIN
            [Icon_Height],
            [Icon_Width],
            [Refresh_Id]
-	FROM [dbo].[tbl_Confluence_Space]
+	FROM [dbo].[tbl_stg_Confluence_Space]
 END
 GO
 GRANT EXECUTE ON  [dbo].[usp_Confluence_Staging_Sync_Space] TO [ConfluenceRefreshRole]
