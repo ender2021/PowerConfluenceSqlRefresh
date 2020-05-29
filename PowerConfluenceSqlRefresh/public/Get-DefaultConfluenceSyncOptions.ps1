@@ -25,7 +25,9 @@ function Get-DefaultConfluenceSyncOptions {
             Groups = @{
                 Users = $true
             }
-            Spaces = $true
+            Spaces = @{
+                Permissions = $true
+            }
         }
     }
     
