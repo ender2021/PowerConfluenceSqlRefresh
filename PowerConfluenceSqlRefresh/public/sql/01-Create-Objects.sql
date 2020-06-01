@@ -159,10 +159,16 @@ PRINT N'Creating [dbo].[tbl_Confluence_User_Group]'
 GO
 CREATE TABLE [dbo].[tbl_Confluence_User_Group]
 (
-[Account_Id] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Group_Name] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Refresh_Id] [int] NULL
+[Account_Id] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+[Group_Name] [varchar] (500) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+[Refresh_Id] [int] NOT NULL
 )
+GO
+IF @@ERROR <> 0 SET NOEXEC ON
+GO
+PRINT N'Creating primary key [PK_tbl_Confluence_User_Group] on [dbo].[tbl_Confluence_User_Group]'
+GO
+ALTER TABLE [dbo].[tbl_Confluence_User_Group] ADD CONSTRAINT [PK_tbl_Confluence_User_Group] PRIMARY KEY CLUSTERED  ([Account_Id], [Group_Name])
 GO
 IF @@ERROR <> 0 SET NOEXEC ON
 GO
@@ -170,16 +176,22 @@ PRINT N'Creating [dbo].[tbl_Confluence_User]'
 GO
 CREATE TABLE [dbo].[tbl_Confluence_User]
 (
-[Account_Id] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Account_Type] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Display_Name] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Public_Name] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Profile_Picture_Url] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Profile_Picture_Height] [bigint] NULL,
-[Profile_Picture_Width] [bigint] NULL,
-[Email] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Refresh_Id] [int] NULL
+[Account_Id] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+[Account_Type] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+[Display_Name] [varchar] (200) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+[Public_Name] [varchar] (200) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+[Profile_Picture_Url] [varchar] (500) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Profile_Picture_Height] [int] NULL,
+[Profile_Picture_Width] [int] NULL,
+[Email] [varchar] (500) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+[Refresh_Id] [int] NOT NULL
 )
+GO
+IF @@ERROR <> 0 SET NOEXEC ON
+GO
+PRINT N'Creating primary key [PK_tbl_Confluence_User] on [dbo].[tbl_Confluence_User]'
+GO
+ALTER TABLE [dbo].[tbl_Confluence_User] ADD CONSTRAINT [PK_tbl_Confluence_User] PRIMARY KEY CLUSTERED  ([Account_Id])
 GO
 IF @@ERROR <> 0 SET NOEXEC ON
 GO
@@ -187,16 +199,22 @@ PRINT N'Creating [dbo].[tbl_Confluence_Space_Permission]'
 GO
 CREATE TABLE [dbo].[tbl_Confluence_Space_Permission]
 (
-[Permission_Id] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Space_Id] [int] NULL,
-[Subject_Type] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Subject_Id] [sql_variant] NULL,
-[Operation] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Target_Type] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Anonymous_Access] [bit] NULL,
-[Unlicensed_Access] [bit] NULL,
-[Refresh_Id] [int] NULL
+[Permission_Id] [int] NOT NULL,
+[Space_Id] [int] NOT NULL,
+[Subject_Type] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Subject_Id] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Operation] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+[Target_Type] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+[Anonymous_Access] [bit] NOT NULL,
+[Unlicensed_Access] [bit] NOT NULL,
+[Refresh_Id] [int] NOT NULL
 )
+GO
+IF @@ERROR <> 0 SET NOEXEC ON
+GO
+PRINT N'Creating primary key [PK_tbl_Confluence_Space_Permission] on [dbo].[tbl_Confluence_Space_Permission]'
+GO
+ALTER TABLE [dbo].[tbl_Confluence_Space_Permission] ADD CONSTRAINT [PK_tbl_Confluence_Space_Permission] PRIMARY KEY CLUSTERED  ([Permission_Id])
 GO
 IF @@ERROR <> 0 SET NOEXEC ON
 GO
@@ -204,16 +222,22 @@ PRINT N'Creating [dbo].[tbl_Confluence_Space]'
 GO
 CREATE TABLE [dbo].[tbl_Confluence_Space]
 (
-[Space_Id] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Space_Key] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Name] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Type] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Status] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Icon_Url] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Icon_Height] [bigint] NULL,
-[Icon_Width] [bigint] NULL,
-[Refresh_Id] [int] NULL
+[Space_Id] [int] NOT NULL,
+[Space_Key] [varchar] (200) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+[Name] [varchar] (500) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+[Type] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+[Status] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+[Icon_Url] [varchar] (500) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Icon_Height] [int] NULL,
+[Icon_Width] [int] NULL,
+[Refresh_Id] [int] NOT NULL
 )
+GO
+IF @@ERROR <> 0 SET NOEXEC ON
+GO
+PRINT N'Creating primary key [PK_tbl_Confluence_Space] on [dbo].[tbl_Confluence_Space]'
+GO
+ALTER TABLE [dbo].[tbl_Confluence_Space] ADD CONSTRAINT [PK_tbl_Confluence_Space] PRIMARY KEY CLUSTERED  ([Space_Id])
 GO
 IF @@ERROR <> 0 SET NOEXEC ON
 GO
@@ -221,10 +245,16 @@ PRINT N'Creating [dbo].[tbl_Confluence_Group]'
 GO
 CREATE TABLE [dbo].[tbl_Confluence_Group]
 (
-[Group_Name] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Group_Id] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Refresh_Id] [int] NULL
+[Group_Name] [varchar] (500) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+[Group_Id] [char] (36) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+[Refresh_Id] [int] NOT NULL
 )
+GO
+IF @@ERROR <> 0 SET NOEXEC ON
+GO
+PRINT N'Creating primary key [PK_tbl_Confluence_Group] on [dbo].[tbl_Confluence_Group]'
+GO
+ALTER TABLE [dbo].[tbl_Confluence_Group] ADD CONSTRAINT [PK_tbl_Confluence_Group] PRIMARY KEY CLUSTERED  ([Group_Name])
 GO
 IF @@ERROR <> 0 SET NOEXEC ON
 GO
@@ -284,10 +314,16 @@ PRINT N'Creating [dbo].[tbl_stg_Confluence_User_Group]'
 GO
 CREATE TABLE [dbo].[tbl_stg_Confluence_User_Group]
 (
-[Account_Id] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Group_Name] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Refresh_Id] [int] NULL
+[Account_Id] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+[Group_Name] [varchar] (500) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+[Refresh_Id] [int] NOT NULL
 )
+GO
+IF @@ERROR <> 0 SET NOEXEC ON
+GO
+PRINT N'Creating primary key [PK_tbl_stg_Confluence_User_Group] on [dbo].[tbl_stg_Confluence_User_Group]'
+GO
+ALTER TABLE [dbo].[tbl_stg_Confluence_User_Group] ADD CONSTRAINT [PK_tbl_stg_Confluence_User_Group] PRIMARY KEY CLUSTERED  ([Account_Id], [Group_Name])
 GO
 IF @@ERROR <> 0 SET NOEXEC ON
 GO
@@ -295,16 +331,22 @@ PRINT N'Creating [dbo].[tbl_stg_Confluence_User]'
 GO
 CREATE TABLE [dbo].[tbl_stg_Confluence_User]
 (
-[Account_Id] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Account_Type] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Display_Name] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Public_Name] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Profile_Picture_Url] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Profile_Picture_Height] [bigint] NULL,
-[Profile_Picture_Width] [bigint] NULL,
-[Email] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Refresh_Id] [int] NULL
+[Account_Id] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+[Account_Type] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+[Display_Name] [varchar] (200) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+[Public_Name] [varchar] (200) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+[Profile_Picture_Url] [varchar] (500) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Profile_Picture_Height] [int] NULL,
+[Profile_Picture_Width] [int] NULL,
+[Email] [varchar] (500) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+[Refresh_Id] [int] NOT NULL
 )
+GO
+IF @@ERROR <> 0 SET NOEXEC ON
+GO
+PRINT N'Creating primary key [PK_tbl_stg_Confluence_User] on [dbo].[tbl_stg_Confluence_User]'
+GO
+ALTER TABLE [dbo].[tbl_stg_Confluence_User] ADD CONSTRAINT [PK_tbl_stg_Confluence_User] PRIMARY KEY CLUSTERED  ([Account_Id])
 GO
 IF @@ERROR <> 0 SET NOEXEC ON
 GO
@@ -312,16 +354,22 @@ PRINT N'Creating [dbo].[tbl_stg_Confluence_Space_Permission]'
 GO
 CREATE TABLE [dbo].[tbl_stg_Confluence_Space_Permission]
 (
-[Permission_Id] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Space_Id] [int] NULL,
-[Subject_Type] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Subject_Id] [sql_variant] NULL,
-[Operation] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Target_Type] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Anonymous_Access] [bit] NULL,
-[Unlicensed_Access] [bit] NULL,
-[Refresh_Id] [int] NULL
+[Permission_Id] [int] NOT NULL,
+[Space_Id] [int] NOT NULL,
+[Subject_Type] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Subject_Id] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Operation] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+[Target_Type] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+[Anonymous_Access] [bit] NOT NULL,
+[Unlicensed_Access] [bit] NOT NULL,
+[Refresh_Id] [int] NOT NULL
 )
+GO
+IF @@ERROR <> 0 SET NOEXEC ON
+GO
+PRINT N'Creating primary key [PK_tbl_stg_Confluence_Space_Permission] on [dbo].[tbl_stg_Confluence_Space_Permission]'
+GO
+ALTER TABLE [dbo].[tbl_stg_Confluence_Space_Permission] ADD CONSTRAINT [PK_tbl_stg_Confluence_Space_Permission] PRIMARY KEY CLUSTERED  ([Permission_Id])
 GO
 IF @@ERROR <> 0 SET NOEXEC ON
 GO
@@ -329,16 +377,22 @@ PRINT N'Creating [dbo].[tbl_stg_Confluence_Space]'
 GO
 CREATE TABLE [dbo].[tbl_stg_Confluence_Space]
 (
-[Space_Id] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Space_Key] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Name] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Type] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Status] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Icon_Url] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Icon_Height] [bigint] NULL,
-[Icon_Width] [bigint] NULL,
-[Refresh_Id] [int] NULL
+[Space_Id] [int] NOT NULL,
+[Space_Key] [varchar] (200) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+[Name] [varchar] (500) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+[Type] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+[Status] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+[Icon_Url] [varchar] (500) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Icon_Height] [int] NULL,
+[Icon_Width] [int] NULL,
+[Refresh_Id] [int] NOT NULL
 )
+GO
+IF @@ERROR <> 0 SET NOEXEC ON
+GO
+PRINT N'Creating primary key [PK_tbl_stg_Confluence_Space] on [dbo].[tbl_stg_Confluence_Space]'
+GO
+ALTER TABLE [dbo].[tbl_stg_Confluence_Space] ADD CONSTRAINT [PK_tbl_stg_Confluence_Space] PRIMARY KEY CLUSTERED  ([Space_Id])
 GO
 IF @@ERROR <> 0 SET NOEXEC ON
 GO
@@ -346,10 +400,16 @@ PRINT N'Creating [dbo].[tbl_stg_Confluence_Group]'
 GO
 CREATE TABLE [dbo].[tbl_stg_Confluence_Group]
 (
-[Group_Name] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Group_Id] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Refresh_Id] [int] NULL
+[Group_Name] [varchar] (500) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+[Group_Id] [char] (36) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+[Refresh_Id] [int] NOT NULL
 )
+GO
+IF @@ERROR <> 0 SET NOEXEC ON
+GO
+PRINT N'Creating primary key [PK_tbl_stg_Confluence_Group] on [dbo].[tbl_stg_Confluence_Group]'
+GO
+ALTER TABLE [dbo].[tbl_stg_Confluence_Group] ADD CONSTRAINT [PK_tbl_stg_Confluence_Group] PRIMARY KEY CLUSTERED  ([Group_Name])
 GO
 IF @@ERROR <> 0 SET NOEXEC ON
 GO
@@ -516,7 +576,7 @@ BEGIN
            [Icon_Height],
            [Icon_Width],
            [Refresh_Id]
-	FROM [dbo].[tbl_Confluence_Space]
+	FROM [dbo].[tbl_stg_Confluence_Space]
 END
 GO
 IF @@ERROR <> 0 SET NOEXEC ON

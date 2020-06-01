@@ -73,7 +73,7 @@ function Update-ConfluenceSpaces {
             if ($getPermissions) {
                 #get the permissions objects, then remove the property from the space objects so it's not written to the db
                 $permissions += $newSpaces | ForEach-Object { $_.Permissions }
-                $newSpaces = $newSpaces | Select-Object -ExcludeProperty Permissions
+                $newSpaces = $newSpaces | Select-Object -ExcludeProperty Permissions -Property '*'
             }
 
             #add space results to master list, checking for duplicates
