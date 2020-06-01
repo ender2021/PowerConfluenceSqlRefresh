@@ -12,7 +12,7 @@
 RootModule = 'PowerConfluenceSqlRefresh.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.0.1'
+ModuleVersion = '1.1.0'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -33,7 +33,7 @@ Copyright = '(c) Justin Mead. All rights reserved.'
 Description = 'A Powershell module for extracting and storing data about a Confluence Cloud instance'
 
 # Minimum version of the PowerShell engine required by this module
-PowerShellVersion = '6.1'
+PowerShellVersion = '5.1'
 
 # Name of the PowerShell host required by this module
 # PowerShellHostName = ''
@@ -54,7 +54,7 @@ PowerShellVersion = '6.1'
 RequiredModules = @(
     @{
         ModuleName="PowerConfluence"
-        ModuleVersion="0.1.1"
+        ModuleVersion="0.2.0"
         Guid="6e741953-480d-44fb-9e1c-117f0747cca1"
     },
     @{
