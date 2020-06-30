@@ -42,6 +42,12 @@ function Update-ConfluenceSpaces {
         $permissions = @()
         $getPermissions = $null -ne $SyncOptions -and $SyncOptions.ContainsKey("Permissions") -and $SyncOptions.Permissions -ne $false
         if (!$getPermissions) { Write-Verbose "Skipping Space Permissions" }
+
+        $sqlConnSplat = @{
+            DatabaseServer = $SqlDatabase
+            DatabaseName = $SqlDatabase
+            SchemaName = $SchemaName
+        }
     }
     
     process {
@@ -90,14 +96,7 @@ function Update-ConfluenceSpaces {
     }
     
     end {
-        $spacesCount = $spaces.Count
-        Write-Verbose "Writing $spacesCount Space record(s) to staging table"
-        $spaces | Write-SqlTableData -ServerInstance $SqlInstance -DatabaseName $SqlDatabase -SchemaName $SchemaName -TableName $spaceTableName
-        
-        if ($getPermissions) {
-            $permissionsCount = $permissions.Count
-            Write-Verbose "Writing $permissionsCount Space Permission record(s) to staging table"
-            $permissions | Write-SqlTableData -ServerInstance $SqlInstance -DatabaseName $SqlDatabase -SchemaName $SchemaName -TableName $permissionTableName
-        }
+        Write-ConfluenceData @sqlConnSplat -Data $spaces -TableName $spaceTableName
+        if ($getPermissions) { Write-ConfluenceData @sqlConnSplat -Data $permissions -TableName $permissionTableName }
     }
 }

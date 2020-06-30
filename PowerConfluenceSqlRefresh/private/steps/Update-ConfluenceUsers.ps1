@@ -26,6 +26,12 @@ function Update-ConfluenceUsers {
         Write-Verbose "Updating Users"
         $tableName = "tbl_stg_Confluence_User"
         $users = @()
+
+        $sqlConnSplat = @{
+            DatabaseServer = $SqlDatabase
+            DatabaseName = $SqlDatabase
+            SchemaName = $SchemaName
+        }
     }
     
     process {
@@ -35,8 +41,6 @@ function Update-ConfluenceUsers {
     }
     
     end {
-        $usersCount = $users.Count
-        Write-Verbose "Writing $usersCount User record(s) to staging table"
-        $users | Write-SqlTableData -ServerInstance $SqlInstance -DatabaseName $SqlDatabase -SchemaName $SchemaName -TableName $tableName
+        Write-ConfluenceData @sqlConnSplat -Data $users -TableName $tableName
     }
 }

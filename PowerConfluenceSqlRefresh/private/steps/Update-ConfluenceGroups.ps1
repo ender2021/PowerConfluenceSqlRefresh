@@ -26,6 +26,12 @@ function Update-ConfluenceGroups {
         Write-Verbose "Updating Groups"
         $tableName = "tbl_stg_Confluence_Group"
         $groups = @()
+
+        $sqlConnSplat = @{
+            DatabaseServer = $SqlDatabase
+            DatabaseName = $SqlDatabase
+            SchemaName = $SchemaName
+        }
     }
     
     process {
@@ -58,9 +64,7 @@ function Update-ConfluenceGroups {
     }
     
     end {
-        $groupCount = $groups.Count
-        Write-Verbose "Writing $groupCount Group record(s) to staging table"
-        $groups | Write-SqlTableData -ServerInstance $SqlInstance -DatabaseName $SqlDatabase -SchemaName $SchemaName -TableName $tableName
+        Write-ConfluenceData @sqlConnSplat -Data $groups -TableName $tableName
         return $groups
     }
 }
