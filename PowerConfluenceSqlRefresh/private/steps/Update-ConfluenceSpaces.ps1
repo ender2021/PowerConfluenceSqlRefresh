@@ -44,7 +44,7 @@ function Update-ConfluenceSpaces {
         if (!$getPermissions) { Write-Verbose "Skipping Space Permissions" }
 
         $sqlConnSplat = @{
-            DatabaseServer = $SqlDatabase
+            DatabaseServer = $SqlInstance
             DatabaseName = $SqlDatabase
             SchemaName = $SchemaName
         }

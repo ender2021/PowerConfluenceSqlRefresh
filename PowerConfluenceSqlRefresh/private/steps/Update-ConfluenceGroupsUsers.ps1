@@ -33,7 +33,7 @@ function Update-ConfluenceGroupsUsers {
         $userGroups = @()
 
         $sqlConnSplat = @{
-            DatabaseServer = $SqlDatabase
+            DatabaseServer = $SqlInstance
             DatabaseName = $SqlDatabase
             SchemaName = $SchemaName
         }

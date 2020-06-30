@@ -28,7 +28,7 @@ function Update-ConfluenceUsers {
         $users = @()
 
         $sqlConnSplat = @{
-            DatabaseServer = $SqlDatabase
+            DatabaseServer = $SqlInstance
             DatabaseName = $SqlDatabase
             SchemaName = $SchemaName
         }
