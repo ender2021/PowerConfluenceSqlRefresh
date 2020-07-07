@@ -48,6 +48,6 @@ function Update-ConfluenceGroupsUsers {
     }
     
     end {
-        Write-ConfluenceData @sqlConnSplat -Data $userGroups -TableName $tableName
+        Write-AtlassianData @sqlConnSplat -Data $userGroups -TableName $tableName
     }
 }

@@ -64,7 +64,7 @@ function Update-ConfluenceGroups {
     }
     
     end {
-        Write-ConfluenceData @sqlConnSplat -Data $groups -TableName $tableName
+        Write-AtlassianData @sqlConnSplat -Data $groups -TableName $tableName
         return $groups
     }
 }

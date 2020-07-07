@@ -41,6 +41,6 @@ function Update-ConfluenceUsers {
     }
     
     end {
-        Write-ConfluenceData @sqlConnSplat -Data $users -TableName $tableName
+        Write-AtlassianData @sqlConnSplat -Data $users -TableName $tableName
     }
 }

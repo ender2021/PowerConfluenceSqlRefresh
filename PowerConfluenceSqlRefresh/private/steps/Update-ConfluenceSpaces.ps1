@@ -96,7 +96,7 @@ function Update-ConfluenceSpaces {
     }
     
     end {
-        Write-ConfluenceData @sqlConnSplat -Data $spaces -TableName $spaceTableName
-        if ($getPermissions) { Write-ConfluenceData @sqlConnSplat -Data $permissions -TableName $permissionTableName }
+        Write-AtlassianData @sqlConnSplat -Data $spaces -TableName $spaceTableName
+        if ($getPermissions) { Write-AtlassianData @sqlConnSplat -Data $permissions -TableName $permissionTableName }
     }
 }
