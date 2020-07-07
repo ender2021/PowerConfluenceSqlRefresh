@@ -100,12 +100,8 @@ function Update-ConfluenceSql {
         #  REFRESH STEP 0 - CONFIGURE                      #
         ####################################################
         #test the sql connection
-        $connString = "Server=$SqlInstance;Database=$SqlDatabase;Trusted_Connection=True;"
-        Write-Verbose "Testing connection to $connString"
-        if (Test-SqlConnection $connString) {
-            Write-Verbose "Connection test succeeded"
-        } else {
-            Write-Verbose "Connection test failed! Terminating refresh"
+        if (!(Test-SqlConnection $SqlInstance $SqlDatabase)) {
+            Write-Verbose "Error while validating database connection! Terminating refresh"
             $ErrorActionPreference = $originalErrorAction
             return $false
         }
