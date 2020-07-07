@@ -67,6 +67,10 @@ function Update-ConfluenceSql {
     )
     
     begin {
+        
+    }
+    
+    process {
         Write-Verbose "Beginning Confluence data update on $SqlInstance in database $SqlDatabase"
         ####################################################
         #  CONFIGURATION                                   #
@@ -92,9 +96,13 @@ function Update-ConfluenceSql {
             $options = Merge-Hashtable -Source $SyncOptions -Target $options
         }
 
+        ####################################################
+        #  REFRESH STEP 0 - CONFIGURE                      #
+        ####################################################
         #test the sql connection
-        Write-Verbose "Testing connection to $SqlInstance"
-        if (Test-SqlConnection $SqlInstance) {
+        $connString = "Server=$SqlInstance;Database=$SqlDatabase;Trusted_Connection=True;"
+        Write-Verbose "Testing connection to $connString"
+        if (Test-SqlConnection $connString) {
             Write-Verbose "Connection test succeeded"
         } else {
             Write-Verbose "Connection test failed! Terminating refresh"
@@ -123,20 +131,13 @@ function Update-ConfluenceSql {
             Write-Error $_
             return $false
         }
-        
-    }
-    
-    process {
+
+        # define a convenient hash for splatting the basic refresh arguments
+        $refreshSplat = @{
+            RefreshId = $refreshId
+        } + $sqlSplat
+
         try {
-            ####################################################
-            #  REFRESH STEP 0 - CONFIGURE                      #
-            ####################################################
-
-            # define a convenient hash for splatting the basic refresh arguments
-            $refreshSplat = @{
-                RefreshId = $refreshId
-            } + $sqlSplat
-
             ####################################################
             #  REFRESH STEP 1 - USERS / GROUPS                 #
             ####################################################
@@ -170,9 +171,7 @@ function Update-ConfluenceSql {
             $refreshSuccess = $false
             $refreshError = $_
         }
-    }
-    
-    end {
+
         ####################################################
         #  RECORD BATCH END                                #
         ####################################################
@@ -206,4 +205,6 @@ function Update-ConfluenceSql {
             return $false
         }
     }
+    
+    end {}
 }
