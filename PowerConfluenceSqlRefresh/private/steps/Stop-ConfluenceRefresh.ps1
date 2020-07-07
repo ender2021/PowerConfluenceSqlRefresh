@@ -14,7 +14,12 @@ function Stop-ConfluenceRefresh {
         # The sql database to update data in
         [Parameter(Mandatory,Position=2)]
         [string]
-        $SqlDatabase
+        $SqlDatabase,
+
+        # Indicates whether the job succeeded or failed
+        [Parameter(Mandatory,Position=3)]
+        [bool]
+        $Success
     )
     
     begin {
@@ -22,7 +27,9 @@ function Stop-ConfluenceRefresh {
     }
     
     process {
-        Invoke-SqlCmd -ServerInstance $SqlInstance -Database $SqlDatabase -Query "EXEC dbo.usp_Confluence_Refresh_Update_End $RefreshId"
+        #magic numbers, bad developer
+        $status = IIF $Success 'C' 'A'
+        Invoke-SqlCmd -ServerInstance $SqlInstance -Database $SqlDatabase -Query "EXEC dbo.usp_Confluence_Refresh_Update_End $RefreshId $status"
     }
     
     end {
