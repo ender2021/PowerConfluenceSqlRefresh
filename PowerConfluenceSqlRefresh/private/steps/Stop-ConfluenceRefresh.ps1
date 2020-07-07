@@ -29,7 +29,7 @@ function Stop-ConfluenceRefresh {
     process {
         #magic numbers, bad developer
         $status = IIF $Success 'C' 'A'
-        Invoke-SqlCmd -ServerInstance $SqlInstance -Database $SqlDatabase -Query "EXEC dbo.usp_Confluence_Refresh_Update_End $RefreshId $status"
+        Invoke-SqlCmd -ServerInstance $SqlInstance -Database $SqlDatabase -Query "EXEC dbo.usp_Confluence_Refresh_Update_End $RefreshId, '$status'"
     }
     
     end {
